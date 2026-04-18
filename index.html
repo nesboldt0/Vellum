@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Vellum IDE</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #111111;
+            color: #d1d1d1;
+            padding: 40px;
+        }
+
+        /* container */
+        .ide-container {
+            display: flex;
+            width: 800px; /* Fixed Width */
+            height: 500px; /* Fixed Height */
+            background: #1a1a1a;
+            border: 1px solid #333;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* line numbers */
+        #line-numbers {
+        width: 40px;
+        background: #151515;
+        color: #444;
+        padding: 20px 0;
+        text-align: center;
+        font-family: "Lucida Console", Monaco, monospace;
+        font-size: 15px; /* Must match editor */
+        line-height: 24px; /* Exact pixel height for each line */
+        user-select: none;
+        border-right: 1px solid #222;
+        overflow: hidden;
+        box-sizing: border-box;
+        }
+
+        /* editor */
+        #editor {
+        flex-grow: 1;
+        background: transparent;
+        color: #e0e0e0;
+        border: none;
+        padding: 20px;
+        font-family: "Lucida Console", Monaco, monospace;
+        font-size: 15px; /* Must match line-numbers */
+        line-height: 24px; /* Exact pixel height for each line */
+        outline: none;
+        resize: none;
+        box-sizing: border-box;
+        }
+
+        #editor::placeholder { color: #444; font-style: italic; }
+
+        /* terminal */
+        #terminal {
+            width: 800px; /* Matches Editor width */
+            height: 150px;
+            background: #080808;
+            color: #888888;
+            padding: 20px;
+            border: 1px solid #222;
+            margin-top: 15px;
+            font-family: "Lucida Console", monospace;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+
+        button {
+            background: #2a2a2a; color: white; border: 1px solid #444;
+            padding: 12px 24px; cursor: pointer; font-weight: bold;
+            margin: 20px 0; text-transform: uppercase;
+        }
+        button:hover { background: #333; border-color: #666; }
+
+        .label { color: #666; font-weight: bold; font-size: 11px; letter-spacing: 2px; margin-bottom: 8px; display: block; }
+    </style>
+</head>
+<body>
+
+    <span class="label">VELLUM EDITOR</span>
+    <div class="ide-container">
+        <div id="line-numbers">1</div>
+        <textarea id="editor" spellcheck="false" placeholder="!user -> 'nesboldt'&#10;?user" oninput="updateLineNumbers()"></textarea>
+    </div>
+
+    <button onclick="runVellum()">RUN CODE &#187;</button>
+
+    <span class="label">TERMINAL OUTPUT</span>
+    <div id="terminal"></div>
+
+    <script>
+        // actual code for line numbers
+        function updateLineNumbers() {
+            const editor = document.getElementById('editor');
+            const lineNumbers = document.getElementById('line-numbers');
+            const lines = editor.value.split('\n').length;
+
+            let numberString = '';
+            for (let i = 1; i <= lines; i++) {
+                numberString += i + '<br>';
+            }
+            lineNumbers.innerHTML = numberString;
+        }
+
+        function runVellum() {
+            const input = document.getElementById('editor').value;
+            const terminal = document.getElementById('terminal');
+            terminal.innerHTML = "";
+
+            const lines = input.split('\n');
+            let js_code = [];
+            /* this is where new syntax goes */
+            lines.forEach(line => {
+                let cleanLine = line.trim();
+                if (!cleanLine || cleanLine.startsWith ('##')){
+                    return;
+                }
+                let tokens = cleanLine.split(' ');
+                let head = tokens[0];
+                //Variable !
+                if (head.startsWith('!')) js_code.push(`var ${head.slice(1)} = ${tokens[2]};`);
+                //Function ~
+               else if (head.startsWith('~')) {
+                // This looks at the head (e.g., "~greet{") and removes the ~ and any {
+                    let funcName = head.slice(1).replace('{', '');
+                    js_code.push(`function ${funcName}() {`);
+                }
+                //Print ?
+                else if (head.startsWith('?')) {
+                    let expression = cleanLine.slice(1).trim();
+                    // Only wrap in printToTerminal if it's not a function call that already prints
+                     js_code.push(`printToTerminal(${expression});`);
+                }
+                //Closing bracket }
+                else if (head === '}') js_code.push('}');
+
+                //End of syntax
+                else js_code.push(`${cleanLine};`);
+                 });
+
+                try {
+                window.printToTerminal = function(data) {
+                    terminal.innerHTML += "> " + data + "<br>";
+                };
+                eval(js_code.join('\n'));
+            } catch (err) {
+                terminal.innerHTML += "<span style='color:red;'>ERROR: " + err.message + "</span>";
+            }
+        }
+    </script>
+</body>
+</html>
