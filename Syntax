@@ -22,7 +22,7 @@ you can also just have functions return values
 return 'hello'
 }
 ?greet()
-- will print 'hello' tp the console
+- will print 'hello' to the console
 
 '##' is how you signify comments
 - ##this will do nothing
