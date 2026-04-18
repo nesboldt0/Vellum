@@ -119,6 +119,10 @@
         color: #6272A4; /* Blue-Gray */
         font-style: italic;
         }
+        .hl-bracket {
+        color: #FF6B6B; /* Reddish-Grapefruit */
+        font-weight: bold;
+        }
         .hl-num {
         color: #8BE9FD; /* Neon Cyan */
         }
@@ -207,7 +211,8 @@
         code = code.replace(/(![a-zA-Z0-9]+)/g, '<span class="hl-var">$1</span>');       // Variables
         code = code.replace(/(~[a-zA-Z0-9]+)/g, '<span class="hl-func">$1</span>');      // Functions
         code = code.replace(/(\?[a-zA-Z0-9]*)/g, '<span class="hl-print">$1</span>');    // Print
-        code = code.replace(/\b(\d+)\b/g, '<span class="hl-num">$1</span>');             // Numbers
+        code = code.replace(/\b(\d+)\b/g, '<span class="hl-num">$1</span>');             // Numbers// Step 3 (Inside the highlighting section)
+        code = code.replace(/([{}])/g, '<span class="hl-bracket">$1</span>'); // Brackets { }
 
         // Make the comments work again (OOOOOO)
         comments.forEach((comment, index) => {
