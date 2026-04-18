@@ -1,0 +1,30 @@
+! marks the creation of a variable
+- '!user' 
+  creates a variable with the name of user
+
+'->' is how you assign values to variables
+- '!user -> nesboldt'
+  gives the variable 'user' the value of 'nesboldt'
+
+'?' is how you print to the console
+- '?'nesboldt'' 
+  will print 'nesboldt' to the console
+
+'~' is how you create a function (use {} for functions)
+- '~greet{
+     ?'hello'
+} 
+greet()
+- will create a function named greet, that, when called, will print 'hello' to the console
+
+you can also just have functions return values
+~greet{
+return 'hello'
+}
+?greet()
+- will print 'hello' tp the console
+
+'##' is how you signify comments
+- ##this will do nothing
+  will do nothing but give you a reminder about what a certain line of code does, etc. 
+
