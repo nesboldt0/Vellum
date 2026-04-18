@@ -3,100 +3,221 @@
 <head>
     <title>Vellum IDE</title>
     <style>
+        /*This is where we establish the body, its fonts, and colors*/
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            background: #111111;
-            color: #d1d1d1;
-            padding: 40px;
+            font-family: 'Segoe UI', sans-serif;
+            background: #1e1e1e;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: #a9b7c6;
         }
 
-        /* container */
+         h1 {
+            font-weight: 800;
+            font-size: 2.2rem;
+            letter-spacing: 3px;
+            color: #4b6eaf; /* Matches The Buttons */
+            margin-bottom: 10px;
+            text-transform: uppercase;
+         }
+
+        .label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: #4b6eaf; /* Matches the heading */
+            margin-bottom: 8px;
+            align-self: flex-start;
+            max-width: 900px;
+            width: 95%;
+            margin-left: auto;
+            margin-right: auto;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+
+        /* We "stack" another editor on top of this to allow the color to be different for each variable*/
         .ide-container {
             display: flex;
-            width: 800px; /* Fixed Width */
-            height: 500px; /* Fixed Height */
-            background: #1a1a1a;
-            border: 1px solid #333;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 95%;
+            max-width: 900px;
+            height: 450px;
+            background: #2b2b2b; /* Charcoal */
+            border: 1px solid #323232;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
         }
 
-        /* line numbers */
         #line-numbers {
-        width: 40px;
-        background: #151515;
-        color: #444;
-        padding: 20px 0;
-        text-align: center;
-        font-family: "Lucida Console", Monaco, monospace;
-        font-size: 15px; /* Must match editor */
-        line-height: 24px; /* Exact pixel height for each line */
-        user-select: none;
-        border-right: 1px solid #222;
-        overflow: hidden;
-        box-sizing: border-box;
+            width: 50px;
+            background: #313335;
+            color: #606366;
+            padding: 20px 0;
+            text-align: center;
+            font-family: 'JetBrains Mono', 'Consolas', monospace;
+            font-size: 14px;
+            line-height: 24px;
+            border-right: 1px solid #323232;
+            z-index: 5;
         }
 
-        /* editor */
-        #editor {
-        flex-grow: 1;
-        background: transparent;
-        color: #e0e0e0;
-        border: none;
-        padding: 20px;
-        font-family: "Lucida Console", Monaco, monospace;
-        font-size: 15px; /* Must match line-numbers */
-        line-height: 24px; /* Exact pixel height for each line */
-        outline: none;
-        resize: none;
-        box-sizing: border-box;
+        .editor-wrapper {
+            position: relative;
+            flex-grow: 1;
         }
 
-        #editor::placeholder { color: #444; font-style: italic; }
-
-        /* terminal */
-        #terminal {
-            width: 800px; /* Matches Editor width */
-            height: 150px;
-            background: #080808;
-            color: #888888;
+        /* Both must have identical fonts/padding to align */
+        #editor, #highlight-layer {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             padding: 20px;
-            border: 1px solid #222;
-            margin-top: 15px;
-            font-family: "Lucida Console", monospace;
+            font-family: 'JetBrains Mono', 'Consolas', monospace;
+            font-size: 16px;
+            line-height: 24px;
+            white-space: pre;
+            word-wrap: break-word;
             box-sizing: border-box;
-            overflow-y: auto;
+            margin: 0;
         }
+
+        #editor {
+            background: transparent;
+            color: transparent; /* Makes text invisible so highlights show through */
+            caret-color: #ffffff; /* Shows the blinking cursor */
+            z-index: 2;
+            border: none;
+            outline: none;
+            resize: none;
+        }
+
+        #highlight-layer {
+            z-index: 1;
+            color: #a9b7c6; /* Default text color */
+            pointer-events: none;
+            white-space: pre-wrap;
+        }
+
+        /* High Contrast Colors */
+        .hl-var {
+        color: #BD93F9; /* Purple */
+        font-weight: bold;
+        text-shadow: 0 0 5px rgba(189, 147, 249, 0.3);
+        }
+        .hl-func {
+        color: #FFB86C; /* Bright Orange */
+        font-weight: bold;
+        }
+        .hl-print {
+        color: #50FA7B; /* Neon Green */
+        text-shadow: 0 0 5px rgba(80, 250, 123, 0.2);
+        }
+        .hl-comment {
+        color: #6272A4; /* Blue-Gray */
+        font-style: italic;
+        }
+        .hl-num {
+        color: #8BE9FD; /* Neon Cyan */
+        }
+        .hl-string {
+        color: #F1FA8C; /* Soft Yellow */
+        }
+        #highlight-layer {
+        z-index: 1;
+        color: #F8F8F2; /* Brighter default text (Off-white) */
+        pointer-events: none;
+        white-space: pre-wrap;
+        }
+
+        /* Buttons :) */
+        .button-group { margin: 20px 0; }
 
         button {
-            background: #2a2a2a; color: white; border: 1px solid #444;
-            padding: 12px 24px; cursor: pointer; font-weight: bold;
-            margin: 20px 0; text-transform: uppercase;
+            background: #4b6eaf; /* Blue */
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: bold;
         }
-        button:hover { background: #333; border-color: #666; }
 
-        .label { color: #666; font-weight: bold; font-size: 11px; letter-spacing: 2px; margin-bottom: 8px; display: block; }
+        #terminal {
+            width: 95%;
+            max-width: 900px;
+            height: 120px;
+            background: #2b2b2b;
+            color: #f8fafc;
+            padding: 15px;
+            border: 1px solid #323232;
+            border-radius: 4px;
+            font-family: monospace;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body>
 
-    <span class="label">VELLUM EDITOR</span>
+<h1>VELLUM EDITOR</h1>
+
+    <span class="label">EDITOR</span>
     <div class="ide-container">
         <div id="line-numbers">1</div>
-        <textarea id="editor" spellcheck="false" placeholder="!user -> 'nesboldt'&#10;?user" oninput="updateLineNumbers()"></textarea>
+        <div class="editor-wrapper">
+            <div id="highlight-layer"></div>
+            <textarea id="editor" spellcheck="false" oninput="handleInput()"></textarea>
+        </div>
     </div>
 
-    <button onclick="runVellum()">RUN CODE &#187;</button>
+    <div class="button-group">
+        <button onclick="runVellum()">RUN CODE &#187;</button>
+    </div>
 
-    <span class="label">TERMINAL OUTPUT</span>
+    <span class="label">TERMINAL</span>
     <div id="terminal"></div>
 
     <script>
-        // actual code for line numbers
-        function updateLineNumbers() {
-            const editor = document.getElementById('editor');
-            const lineNumbers = document.getElementById('line-numbers');
-            const lines = editor.value.split('\n').length;
+        const editor = document.getElementById('editor');
+        const highlightLayer = document.getElementById('highlight-layer');
+        const lineNumbers = document.getElementById('line-numbers');
 
+        // Combined function for input
+        function handleInput() {
+            updateHighlighter();
+            updateLineNumbers();
+        }
+        function updateHighlighter() {
+        let code = editor.value;
+
+        // Not break the website
+        code = code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+        // Actually make comments work and not break everything
+        const comments = [];
+        code = code.replace(/(##.*)/g, (match) => {
+            comments.push(match);
+            return `___COMMENT_${comments.length - 1}___`;
+        });
+
+        // Apply Highlighting
+        code = code.replace(/(['"])(.*?)\1/g, '<span class="hl-string">$1$2$1</span>'); // Strings
+        code = code.replace(/(![a-zA-Z0-9]+)/g, '<span class="hl-var">$1</span>');       // Variables
+        code = code.replace(/(~[a-zA-Z0-9]+)/g, '<span class="hl-func">$1</span>');      // Functions
+        code = code.replace(/(\?[a-zA-Z0-9]*)/g, '<span class="hl-print">$1</span>');    // Print
+        code = code.replace(/\b(\d+)\b/g, '<span class="hl-num">$1</span>');             // Numbers
+
+        // Make the comments work again (OOOOOO)
+        comments.forEach((comment, index) => {
+            code = code.replace(`___COMMENT_${index}___`, `<span class="hl-comment">${comment}</span>`);
+        });
+
+        highlightLayer.innerHTML = code + "\n";
+    }
+        function updateLineNumbers() {
+            const lines = editor.value.split('\n').length;
             let numberString = '';
             for (let i = 1; i <= lines; i++) {
                 numberString += i + '<br>';
@@ -105,48 +226,46 @@
         }
 
         function runVellum() {
-            const input = document.getElementById('editor').value;
+            const input = editor.value;
             const terminal = document.getElementById('terminal');
             terminal.innerHTML = "";
 
             const lines = input.split('\n');
             let js_code = [];
-            /* this is where new syntax goes */
+
             lines.forEach(line => {
                 let cleanLine = line.trim();
-                if (!cleanLine || cleanLine.startsWith ('##')){
-                    return;
-                }
+                if (!cleanLine || cleanLine.startsWith('##')) return;
+
                 let tokens = cleanLine.split(' ');
                 let head = tokens[0];
-                //Variable !
-                if (head.startsWith('!')) js_code.push(`var ${head.slice(1)} = ${tokens[2]};`);
-                //Function ~
-               else if (head.startsWith('~')) {
-                // This looks at the head (e.g., "~greet{") and removes the ~ and any {
+
+                if (head.startsWith('!')) {
+                    js_code.push(`var ${head.slice(1)} = ${tokens[2]};`);
+                }
+                else if (head.startsWith('~')) {
                     let funcName = head.slice(1).replace('{', '');
                     js_code.push(`function ${funcName}() {`);
                 }
-                //Print ?
                 else if (head.startsWith('?')) {
                     let expression = cleanLine.slice(1).trim();
-                    // Only wrap in printToTerminal if it's not a function call that already prints
-                     js_code.push(`printToTerminal(${expression});`);
+                    js_code.push(`printToTerminal(${expression});`);
                 }
-                //Closing bracket }
-                else if (head === '}') js_code.push('}');
+                else if (head === '}') {
+                    js_code.push('}');
+                }
+                else {
+                    js_code.push(`${cleanLine};`);
+                }
+            });
 
-                //End of syntax
-                else js_code.push(`${cleanLine};`);
-                 });
-
-                try {
+            try {
                 window.printToTerminal = function(data) {
                     terminal.innerHTML += "> " + data + "<br>";
                 };
                 eval(js_code.join('\n'));
             } catch (err) {
-                terminal.innerHTML += "<span style='color:red;'>ERROR: " + err.message + "</span>";
+                terminal.innerHTML += "<span style='color:#ff6b6b;'>ERROR: " + err.message + "</span>";
             }
         }
     </script>
