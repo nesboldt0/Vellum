@@ -14,3 +14,5 @@ For those curious let me explain how this all works
 - When the user clicks "run code" the JavaScript program is ran, showing the user the output of what they created
 
 I am more than happy to answer any questions or take any suggestions
+
+(NOTE, IF A NEW UPDATE HAS BEEN PUSHED AND YOU CANT USE IT ON TEH WEBSITE CLICK CTRL+F5)
