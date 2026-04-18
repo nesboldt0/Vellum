@@ -193,6 +193,34 @@
             updateHighlighter();
             updateLineNumbers();
         }
+        editor.addEventListener('keydown', function(e) {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const start = this.selectionStart;
+                const end = this.selectionEnd;
+                const value = this.value;
+
+                if (!e.shiftKey) {
+                    // REGULAR TAB: Insert 4 spaces
+                    this.value = value.substring(0, start) + "    " + value.substring(end);
+                    this.selectionStart = this.selectionEnd = start + 4;
+                } else {
+                    // SHIFT + TAB: Remove up to 4 spaces
+                    // Check the 4 characters immediately before the cursor
+                    const before = value.substring(start - 4, start);
+
+                    // We only want to delete if the characters are actually spaces
+                    if (before.endsWith(" ")) {
+                        // Find how many spaces to remove (up to 4)
+                        const spacesToRemove = before.match(/ +$/)[0].length;
+                        this.value = value.substring(0, start - spacesToRemove) + value.substring(end);
+                        this.selectionStart = this.selectionEnd = start - spacesToRemove;
+                    }
+                }
+
+                handleInput(); // Re-sync the highlighting
+            }
+        });
         function updateHighlighter() {
         let code = editor.value;
 
@@ -214,7 +242,7 @@
         code = code.replace(/\b(\d+)\b/g, '<span class="hl-num">$1</span>');             // Numbers// Step 3 (Inside the highlighting section)
         code = code.replace(/([{}])/g, '<span class="hl-bracket">$1</span>'); // Brackets { }
 
-        // Make the comments work again (OOOOOO)
+        // Make the comments work again (scaryyyyyyy)
         comments.forEach((comment, index) => {
             code = code.replace(`___COMMENT_${index}___`, `<span class="hl-comment">${comment}</span>`);
         });
