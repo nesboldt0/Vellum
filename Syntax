@@ -1,30 +1,46 @@
 '!' marks the creation of a variable
-- '!user' 
+- !user 
   creates a variable with the name of user
 
 '->' is how you assign values to variables
-- '!user -> nesboldt'
+- !user -> 'nesboldt'
   gives the variable 'user' the value of 'nesboldt'
 
 '?' is how you print to the console
-- '?'nesboldt'' 
+- ?'nesboldt' 
   will print 'nesboldt' to the console
 
-'~' is how you create a function (use {} for functions)
-- '~greet{
-     ?'hello'
-} 
-greet()
-- will create a function named greet, that, when called, will print 'hello' to the console
+'&' is how you start an 'if' statement (use {} for the block)
+- & score > 90 { ?'A' }
+  checks if score is greater than 90
 
-you can also just have functions return values
-~greet{
-return 'hello'
-}
-?greet()
-- will print 'hello' to the console
+'?&' is how you do an 'else if' (automatically closes the previous block)
+- ?& score > 70 { ?'B' }
+  used after an '&' block to check a second condition
+
+'::' is how you do an 'else' (automatically closes the previous block)
+- :: { ?'F' }
+  runs if the previous '&' or '?&' conditions were false
+
+-note for if/else statments, for the 'if' statment, you do not need to close the {} when adding the else statement
+  ex. & score > 90 { ?'A'
+      ?& score > 80 { ?'B'
+      :: { ?'failure' }
+
+'@' is how you create a loop
+- @ 5 { ?'hello' }
+  will print 'hello' to the console 5 times
+
+'~' is how you create a function (use {} for functions)
+- ~greet { ?'hello' }
+  greet()
+  - will create a function named greet, that, when called, will print 'hello' to the console
+
+- you can also just have functions return values
+  ~greet { return 'hello' }
+  ?greet()
+  - will print 'hello' to the console
 
 '##' is how you signify comments
 - ##this will do nothing
-  will do nothing but give you a reminder about what a certain line of code does, etc. 
-
+  will do nothing but give you a reminder about what a certain line of code does, etc.
