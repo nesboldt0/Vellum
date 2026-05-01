@@ -1,186 +1,93 @@
 <!DOCTYPE html>
 <html>
+<!-- vellum IDE: charcoal clion setup -->
 <head>
     <title>Vellum IDE</title>
     <style>
-        /*This is where we establish the body, its fonts, and colors*/
+        /* ui basics and general layout */
         body {
             font-family: 'Segoe UI', sans-serif;
             background: #1e1e1e;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            color: #a9b7c6;
+            display: flex; flex-direction: column; align-items: center;
+            padding: 20px; color: #a9b7c6;
         }
 
-         h1 {
-            font-weight: 800;
-            font-size: 2.2rem;
-            letter-spacing: 3px;
-            color: #4b6eaf; /* Matches The Buttons */
-            margin-bottom: 10px;
-            text-transform: uppercase;
-         }
-
-        .label {
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            color: #4b6eaf; /* Matches the heading */
-            margin-bottom: 8px;
-            align-self: flex-start;
-            max-width: 900px;
-            width: 95%;
-            margin-left: auto;
-            margin-right: auto;
-            text-transform: uppercase;
-            opacity: 0.8;
+        h1 {
+            font-weight: 800; font-size: 2.2rem; letter-spacing: 3px;
+            color: #4b6eaf; margin-bottom: 10px; text-transform: uppercase;
         }
 
-        /* We "stack" another editor on top of this to allow the color to be different for each variable*/
+        /* main editor box and scroll stuff */
         .ide-container {
-            display: flex;
-            width: 95%;
-            max-width: 900px;
-            height: 450px;
-            background: #2b2b2b; /* Charcoal */
-            border: 1px solid #323232;
-            border-radius: 4px;
-            overflow: hidden;
-            position: relative;
+            display: flex; width: 95%; max-width: 900px; height: 480px;
+            background: #2b2b2b; border: 1px solid #323232; border-radius: 4px;
+            position: relative; overflow: hidden;
         }
 
         #line-numbers {
-            width: 50px;
-            background: #313335;
-            color: #606366;
-            padding: 20px 0;
-            text-align: center;
-            font-family: 'JetBrains Mono', 'Consolas', monospace;
-            font-size: 14px;
-            line-height: 24px;
-            border-right: 1px solid #323232;
-            z-index: 5;
+            width: 50px; background: #313335; color: #606366;
+            padding: 20px 0; text-align: center; font-family: 'JetBrains Mono', monospace;
+            font-size: 14px; line-height: 24px; border-right: 1px solid #323232;
+            overflow: hidden; user-select: none;
         }
 
-        .editor-wrapper {
-            position: relative;
-            flex-grow: 1;
-        }
+        .editor-wrapper { position: relative; flex-grow: 1; height: 100%; }
 
-        /* Both must have identical fonts/padding to align */
+        /* getting the invisible input layer to line up with the highlight layer */
         #editor, #highlight-layer {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            padding: 20px;
-            font-family: 'JetBrains Mono', 'Consolas', monospace;
-            font-size: 16px;
-            line-height: 24px;
-            white-space: pre;
-            word-wrap: break-word;
-            box-sizing: border-box;
-            margin: 0;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            padding: 20px; font-family: 'JetBrains Mono', monospace;
+            font-size: 16px; line-height: 24px; white-space: pre;
+            word-wrap: normal; box-sizing: border-box; margin: 0;
+            overflow: auto;
         }
 
         #editor {
-            background: transparent;
-            color: transparent; /* Makes text invisible so highlights show through */
-            caret-color: #ffffff; /* Shows the blinking cursor */
-            z-index: 2;
-            border: none;
-            outline: none;
-            resize: none;
+            background: transparent; color: transparent;
+            caret-color: #ffffff; z-index: 2; border: none;
+            outline: none; resize: none;
         }
 
-        #highlight-layer {
-            z-index: 1;
-            color: #a9b7c6; /* Default text color */
-            pointer-events: none;
-            white-space: pre-wrap;
-        }
+        #highlight-layer { z-index: 1; color: #F8F8F2; pointer-events: none; overflow: hidden; }
 
-        /* High Contrast Colors */
-        .hl-var {
-        color: #BD93F9; /* Purple */
-        font-weight: bold;
-        text-shadow: 0 0 5px rgba(189, 147, 249, 0.3);
-        }
-        .hl-func {
-        color: #FFB86C; /* Bright Orange */
-        font-weight: bold;
-        }
-        .hl-print {
-        color: #50FA7B; /* Neon Green */
-        text-shadow: 0 0 5px rgba(80, 250, 123, 0.2);
-        }
-        .hl-comment {
-        color: #6272A4; /* Blue-Gray */
-        font-style: italic;
-        }
-        .hl-bracket {
-        color: #FF6B6B; /* Reddish-Grapefruit */
-        font-weight: bold;
-        }
-        .hl-num {
-        color: #8BE9FD; /* Neon Cyan */
-        }
-        .hl-string {
-        color: #F1FA8C; /* Soft Yellow */
-        }
-        #highlight-layer {
-        z-index: 1;
-        color: #F8F8F2; /* Brighter default text (Off-white) */
-        pointer-events: none;
-        white-space: pre-wrap;
-        }
-
-        /* Buttons :) */
-        .button-group { margin: 20px 0; }
+        /* vellum syntax colors */
+        .hl-var { color: #BD93F9; }
+        .hl-func { color: #FFB86C; }
+        .hl-print { color: #50FA7B; }
+        .hl-comment { color: #6272A4; font-style: italic; }
+        .hl-bracket { color: #FF6B6B; }
+        .hl-num { color: #8BE9FD; }
+        .hl-string { color: #F1FA8C; }
+        .hl-logic { color: #FF79C6; }
+        .hl-loop { color: #8BE9FD; }
 
         button {
-            background: #4b6eaf; /* Blue */
-            color: white;
-            border: none;
-            padding: 10px 25px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-weight: bold;
+            background: #4b6eaf; color: white; border: none;
+            padding: 12px 30px; border-radius: 4px; cursor: pointer;
+            font-weight: bold; margin: 20px 0;
         }
 
         #terminal {
-            width: 95%;
-            max-width: 900px;
-            height: 120px;
-            background: #2b2b2b;
-            color: #f8fafc;
-            padding: 15px;
-            border: 1px solid #323232;
-            border-radius: 4px;
-            font-family: monospace;
-            overflow-y: auto;
+            width: 95%; max-width: 900px; height: 150px;
+            background: #1e1e1e; color: #f8fafc; padding: 15px;
+            border: 1px solid #323232; border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace; overflow-y: auto;
         }
     </style>
 </head>
 <body>
 
-<h1>VELLUM EDITOR</h1>
-
-    <span class="label">EDITOR</span>
+    <h1>VELLUM EDITOR</h1>
     <div class="ide-container">
         <div id="line-numbers">1</div>
         <div class="editor-wrapper">
             <div id="highlight-layer"></div>
-            <textarea id="editor" spellcheck="false" oninput="handleInput()"></textarea>
+            <textarea id="editor" spellcheck="false" oninput="handleInput()" onscroll="syncScroll()"></textarea>
         </div>
     </div>
 
-    <div class="button-group">
-        <button onclick="runVellum()">RUN CODE &#187;</button>
-    </div>
+    <button onclick="runVellum()">RUN CODE &#187;</button>
 
-    <span class="label">TERMINAL</span>
     <div id="terminal"></div>
 
     <script>
@@ -188,76 +95,55 @@
         const highlightLayer = document.getElementById('highlight-layer');
         const lineNumbers = document.getElementById('line-numbers');
 
-        // Combined function for input
+        // keeping all layers locked on scroll
+        function syncScroll() {
+            highlightLayer.scrollTop = editor.scrollTop;
+            highlightLayer.scrollLeft = editor.scrollLeft;
+            lineNumbers.scrollTop = editor.scrollTop;
+        }
+
         function handleInput() {
             updateHighlighter();
             updateLineNumbers();
+            syncScroll();
         }
-        editor.addEventListener('keydown', function(e) {
-            if (e.key === 'Tab') {
-                e.preventDefault();
-                const start = this.selectionStart;
-                const end = this.selectionEnd;
-                const value = this.value;
 
-                if (!e.shiftKey) {
-                    // REGULAR TAB: Insert 4 spaces
-                    this.value = value.substring(0, start) + "    " + value.substring(end);
-                    this.selectionStart = this.selectionEnd = start + 4;
-                } else {
-                    // SHIFT + TAB: Remove up to 4 spaces
-                    // Check the 4 characters immediately before the cursor
-                    const before = value.substring(start - 4, start);
-
-                    // We only want to delete if the characters are actually spaces
-                    if (before.endsWith(" ")) {
-                        // Find how many spaces to remove (up to 4)
-                        const spacesToRemove = before.match(/ +$/)[0].length;
-                        this.value = value.substring(0, start - spacesToRemove) + value.substring(end);
-                        this.selectionStart = this.selectionEnd = start - spacesToRemove;
-                    }
-                }
-
-                handleInput(); // Re-sync the highlighting
-            }
-        });
+        // finding and coloring our vellum runes
         function updateHighlighter() {
-        let code = editor.value;
+            let code = editor.value;
+            code = code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-        // Not break the website
-        code = code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            const comments = [];
+            // pulling the ## comments out first so they dont get messed up by the regex
+            code = code.replace(/(##.*)/g, (match) => {
+                comments.push(match);
+                return `__C${comments.length - 1}__`;
+            });
 
-        // Actually make comments work and not break everything
-        const comments = [];
-        code = code.replace(/(##.*)/g, (match) => {
-            comments.push(match);
-            return `___COMMENT_${comments.length - 1}___`;
-        });
+            code = code.replace(/(['"])(.*?)\1/g, '<span class="hl-string">$1$2$1</span>');
+            code = code.replace(/(![a-zA-Z0-9_]+)/g, '<span class="hl-var">$1</span>');
+            code = code.replace(/(~[a-zA-Z0-9_]+)/g, '<span class="hl-func">$1</span>');
+            code = code.replace(/(\?)/g, '<span class="hl-print">$1</span>');
+            // logic highlighting for :: and ?&
+            code = code.replace(/(\?&amp;|&amp;|::)/g, '<span class="hl-logic">$1</span>');
+            code = code.replace(/(@)/g, '<span class="hl-loop">$1</span>');
+            code = code.replace(/\b(\d+)\b/g, '<span class="hl-num">$1</span>');
+            code = code.replace(/([{}])/g, '<span class="hl-bracket">$1</span>');
 
-        // Apply Highlighting
-        code = code.replace(/(['"])(.*?)\1/g, '<span class="hl-string">$1$2$1</span>'); // Strings
-        code = code.replace(/(![a-zA-Z0-9]+)/g, '<span class="hl-var">$1</span>');       // Variables
-        code = code.replace(/(~[a-zA-Z0-9]+)/g, '<span class="hl-func">$1</span>');      // Functions
-        code = code.replace(/(\?[a-zA-Z0-9]*)/g, '<span class="hl-print">$1</span>');    // Print
-        code = code.replace(/\b(\d+)\b/g, '<span class="hl-num">$1</span>');             // Numbers// Step 3 (Inside the highlighting section)
-        code = code.replace(/([{}])/g, '<span class="hl-bracket">$1</span>'); // Brackets { }
+            // putting the comments back in with the right color
+            comments.forEach((comment, index) => {
+                code = code.replace(`__C${index}__`, `<span class="hl-comment">${comment}</span>`);
+            });
 
-        // Make the comments work again (scaryyyyyyy)
-        comments.forEach((comment, index) => {
-            code = code.replace(`___COMMENT_${index}___`, `<span class="hl-comment">${comment}</span>`);
-        });
+            highlightLayer.innerHTML = code + (code.endsWith('\n') ? ' ' : '');
+        }
 
-        highlightLayer.innerHTML = code + "\n";
-    }
         function updateLineNumbers() {
             const lines = editor.value.split('\n').length;
-            let numberString = '';
-            for (let i = 1; i <= lines; i++) {
-                numberString += i + '<br>';
-            }
-            lineNumbers.innerHTML = numberString;
+            lineNumbers.innerHTML = Array.from({length: lines}, (_, i) => i + 1).join('<br>');
         }
 
+        // translating the runes into actual js
         function runVellum() {
             const input = editor.value;
             const terminal = document.getElementById('terminal');
@@ -266,41 +152,71 @@
             const lines = input.split('\n');
             let js_code = [];
 
-            lines.forEach(line => {
-                let cleanLine = line.trim();
-                if (!cleanLine || cleanLine.startsWith('##')) return;
+            lines.forEach((line) => {
+                // ignoring the comments so they dont run
+                let cleanLine = line.split('##')[0].trim();
+                if (!cleanLine) return;
 
-                let tokens = cleanLine.split(' ');
-                let head = tokens[0];
-
-                if (head.startsWith('!')) {
-                    js_code.push(`var ${head.slice(1)} = ${tokens[2]};`);
+                // doing variable assignment
+                if (cleanLine.includes('->')) {
+                    let [left, right] = cleanLine.split('->');
+                    let varName = left.trim().replace('!', '');
+                    js_code.push(`var ${varName} = ${right.trim()};`);
                 }
-                else if (head.startsWith('~')) {
-                    let funcName = head.slice(1).replace('{', '');
-                    js_code.push(`function ${funcName}() {`);
+                // setting up the for loop
+                else if (cleanLine.startsWith('@')) {
+                    let count = cleanLine.replace('@', '').split('{')[0].trim();
+                    js_code.push(`for (let i = 0; i < ${count}; i++) {`);
                 }
-                else if (head.startsWith('?')) {
-                    let expression = cleanLine.slice(1).trim();
-                    js_code.push(`printToTerminal(${expression});`);
+                // printing stuff to the terminal div
+                else if (cleanLine.startsWith('?')) {
+                    // special check to make sure it's not an else-if (?&)
+                    if (!cleanLine.startsWith('?&')) {
+                        let content = cleanLine.substring(1).trim();
+                        js_code.push(`printToTerminal(${content});`);
+                    } else {
+                        let cond = cleanLine.substring(2).split('{')[0].trim();
+                        js_code.push(`} else if (${cond}) {`);
+                    }
                 }
-                else if (head === '}') {
+                // if statement logic
+                else if (cleanLine.startsWith('&')) {
+                    let cond = cleanLine.substring(1).split('{')[0].trim();
+                    js_code.push(`if (${cond}) {`);
+                }
+                // else logic - uses implicit closure to avoid token errors
+                else if (cleanLine.startsWith('::')) {
+                    js_code.push('} else {');
+                }
+                // defining the function with {}
+                else if (cleanLine.startsWith('~')) {
+                    let fName = cleanLine.substring(1).split('{')[0].trim();
+                    js_code.push(`function ${fName}() {`);
+                }
+                // closing braces
+                else if (cleanLine === '}') {
                     js_code.push('}');
                 }
+                // handle return statements or direct function calls
                 else {
-                    js_code.push(`${cleanLine};`);
+                    let translated = cleanLine.replace(/!/g, '');
+                    js_code.push(translated + (translated.endsWith('{') || translated.endsWith('}') || translated.endsWith(';') ? '' : ';'));
                 }
             });
 
+            // running the code as one long string
             try {
-                window.printToTerminal = function(data) {
+                window.printToTerminal = (data) => {
                     terminal.innerHTML += "> " + data + "<br>";
+                    terminal.scrollTop = terminal.scrollHeight;
                 };
-                eval(js_code.join('\n'));
+                eval(js_code.join(' '));
             } catch (err) {
-                terminal.innerHTML += "<span style='color:#ff6b6b;'>ERROR: " + err.message + "</span>";
+                terminal.innerHTML += "<span style='color:#FF6B6B;'>ERROR: " + err.message + "</span>";
             }
         }
+
+        handleInput();
     </script>
 </body>
 </html>
