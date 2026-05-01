@@ -13,4 +13,4 @@ For those curious let me explain how this all works
 
 I am more than happy to answer any questions or take any suggestions
 
-(NOTE, IF A NEW UPDATE HAS BEEN PUSHED AND YOU CANT USE IT ON TEH WEBSITE CLICK CTRL+F5)
+(NOTE, IF A NEW UPDATE HAS BEEN PUSHED AND YOU CANT USE IT ON THE WEBSITE CLICK CTRL+F5)
